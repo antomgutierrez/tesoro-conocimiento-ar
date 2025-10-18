@@ -166,6 +166,19 @@
             </button>
         </div>
         
+        <!-- Patio Marker -->
+        <div class="marker-section">
+            <div class="marker-title">🌳 Marcador de Patio</div>
+            <div class="marker-description">
+                Cuarto marcador en la secuencia. Espacio de encuentro al aire libre.
+            </div>
+            <canvas id="patio-canvas" class="marker-canvas" width="400" height="400"></canvas>
+            <br>
+            <button class="download-btn" onclick="downloadMarker('patio-canvas', 'patio-marker')">
+                📥 Descargar Marcador de Patio
+            </button>
+        </div>
+        
         <!-- Biblioteca Marker -->
         <div class="marker-section">
             <div class="marker-title">📚 Marcador de Biblioteca (Tesoro)</div>
@@ -219,6 +232,9 @@
                     break;
                 case 'cantina':
                     drawCantinaMarker(ctx);
+                    break;
+                case 'patio':
+                    drawPatioMarker(ctx);
                     break;
                 case 'biblioteca':
                     drawBibliotecaMarker(ctx);
@@ -316,6 +332,59 @@
             ctx.fillText('UCU', 200, 350);
         }
         
+        function drawPatioMarker(ctx) {
+            // Dibujar árbol estilizado
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillRect(180, 120, 40, 80);
+            
+            // Copa del árbol
+            ctx.fillStyle = '#2E7D32';
+            ctx.beginPath();
+            ctx.arc(200, 120, 60, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Banco
+            ctx.fillStyle = '#8D6E63';
+            ctx.fillRect(120, 220, 160, 20);
+            
+            // Personas (círculos)
+            ctx.fillStyle = '#FFC107';
+            ctx.beginPath();
+            ctx.arc(150, 200, 15, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(250, 200, 15, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Sol
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(320, 80, 25, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Rayos del sol
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 3;
+            for(let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI) / 4;
+                const x1 = 320 + Math.cos(angle) * 35;
+                const y1 = 80 + Math.sin(angle) * 35;
+                const x2 = 320 + Math.cos(angle) * 45;
+                const y2 = 80 + Math.sin(angle) * 45;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+            
+            // Texto
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('PATIO', 200, 320);
+            ctx.fillText('UCU', 200, 350);
+        }
+        
         function drawBibliotecaMarker(ctx) {
             // Dibujar estantería con libros
             ctx.fillStyle = '#6A1B9A';
@@ -370,6 +439,7 @@
             drawMarker('reception-canvas', 'reception');
             drawMarker('aula-magna-canvas', 'aula-magna');
             drawMarker('cantina-canvas', 'cantina');
+            drawMarker('patio-canvas', 'patio');
             drawMarker('biblioteca-canvas', 'biblioteca');
         };
     </script>

@@ -127,13 +127,13 @@
     <!-- UI Elements -->
     <div id="ui">
         <div class="progress-container">
-            <div>Progreso: <span id="progress">0/4</span></div>
+            <div>Progreso: <span id="progress">0/5</span></div>
             <div>Pistas encontradas: <span id="clues-found">0</span></div>
         </div>
         
         <div class="instructions">
             <div>🎯 <strong>El Tesoro del Conocimiento</strong></div>
-            <div>Busca los marcadores en: Recepción → Aula Magna → Cantina → Biblioteca</div>
+            <div>Busca los marcadores en: Recepción → Aula Magna → Cantina → Patio → Biblioteca</div>
             <div>Usa la cámara para escanear los marcadores impresos</div>
         </div>
         
@@ -165,7 +165,7 @@
         <a-marker 
             id="reception-marker" 
             type="pattern" 
-            url="markers/reception-marker.patt"
+            url="markers/pattern-RECEPCION.patt"
             emitevents="true"
             cursor="rayOrigin: mouse">
             
@@ -217,7 +217,7 @@
         <a-marker 
             id="aula-magna-marker" 
             type="pattern" 
-            url="markers/aula-magna-marker.patt"
+            url="markers/pattern-AULA_MAGNA.patt"
             emitevents="true"
             cursor="rayOrigin: mouse">
             
@@ -271,7 +271,7 @@
         <a-marker 
             id="cantina-marker" 
             type="pattern" 
-            url="markers/cantina-marker.patt"
+            url="markers/pattern-CANTINA.patt"
             emitevents="true"
             cursor="rayOrigin: mouse">
             
@@ -303,7 +303,7 @@
             </a-text>
             
             <a-text 
-                value="➡️ Busca el marcador en la Biblioteca" 
+                value="➡️ Busca el marcador en el Patio" 
                 position="0 -1 0" 
                 align="center" 
                 color="#FF6B35" 
@@ -320,11 +320,64 @@
             </a-cylinder>
         </a-marker>
         
+        <!-- Patio Marker -->
+        <a-marker 
+            id="patio-marker" 
+            type="pattern" 
+            url="markers/pattern-PATIO.patt"
+            emitevents="true"
+            cursor="rayOrigin: mouse">
+            
+            <a-plane 
+                position="0 0 0" 
+                rotation="-90 0 0" 
+                width="2" 
+                height="2" 
+                color="#4CAF50"
+                opacity="0.3">
+            </a-plane>
+            
+            <a-text 
+                value="🌳 PATIO" 
+                position="0 1.5 0" 
+                align="center" 
+                color="#2E7D32" 
+                width="6"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-text 
+                value="El espacio de encuentro al aire libre\nDonde los estudiantes se reúnen\npara compartir ideas y descansar\n\nLa naturaleza también enseña..." 
+                position="0 0.5 0" 
+                align="center" 
+                color="#1B5E20" 
+                width="4"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-text 
+                value="➡️ Busca el marcador en la Biblioteca" 
+                position="0 -1 0" 
+                align="center" 
+                color="#FF6B35" 
+                width="3"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-cone 
+                position="0 2 0" 
+                radius-bottom="0.1" 
+                height="0.2" 
+                color="#FFD700"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+            </a-cone>
+        </a-marker>
+        
         <!-- Biblioteca Marker (Tesoro) -->
         <a-marker 
             id="biblioteca-marker" 
             type="pattern" 
-            url="markers/biblioteca-marker.patt"
+            url="markers/pattern-BIBLIOTECA.patt"
             emitevents="true"
             cursor="rayOrigin: mouse">
             
@@ -389,7 +442,7 @@
         // Game state
         let gameState = {
             foundMarkers: new Set(),
-            totalMarkers: 4,
+            totalMarkers: 5,
             currentMarker: null
         };
         
@@ -480,6 +533,7 @@
                 { id: 'reception-marker', name: 'Recepción', description: 'Punto de inicio de tu aventura' },
                 { id: 'aula-magna-marker', name: 'Aula Magna', description: 'Donde se imparte el conocimiento' },
                 { id: 'cantina-marker', name: 'Cantina', description: 'Lugar de encuentro estudiantil' },
+                { id: 'patio-marker', name: 'Patio', description: 'Espacio de encuentro al aire libre' },
                 { id: 'biblioteca-marker', name: 'Biblioteca', description: 'El tesoro del conocimiento' }
             ];
             

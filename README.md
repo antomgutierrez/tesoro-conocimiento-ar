@@ -11,7 +11,8 @@ Los jugadores deben encontrar el "Tesoro del Conocimiento" perdido en el Edifici
 1. **🏛️ Recepción** - Punto de inicio con la historia del edificio
 2. **🎓 Aula Magna** - Pista sobre la importancia del aprendizaje
 3. **🍽️ Cantina** - Pista sobre la comunidad estudiantil
-4. **📚 Biblioteca** - Tesoro final del conocimiento
+4. **🌳 Patio** - Pista sobre el espacio de encuentro al aire libre
+5. **📚 Biblioteca** - Tesoro final del conocimiento
 
 ## 🚀 Cómo Jugar
 
@@ -84,10 +85,11 @@ Los jugadores deben encontrar el "Tesoro del Conocimiento" perdido en el Edifici
 AR/
 ├── index.html              # Archivo principal del juego
 ├── markers/                # Archivos de patrones AR
-│   ├── reception-marker.patt
-│   ├── aula-magna-marker.patt
-│   ├── cantina-marker.patt
-│   └── biblioteca-marker.patt
+│   ├── pattern-RECEPCION.patt
+│   ├── pattern-AULA_MAGNA.patt
+│   ├── pattern-CANTINA.patt
+│   ├── pattern-PATIO.patt
+│   └── pattern-BIBLIOTECA.patt
 ├── README.md              # Este archivo
 └── preguntas.md           # Respuestas del proyecto
 ```
