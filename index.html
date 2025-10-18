@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Tesoro del Conocimiento - AR UCU</title>
+    
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    
+    <!-- AR.js -->
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/ar.js@1.2.0/build/aframe-ar-nft.js"></script>
+    
+    <!-- A-Frame extras -->
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+        
+        #ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .progress-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            pointer-events: auto;
+        }
+        
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 90%;
+            pointer-events: auto;
+        }
+        
+        .found-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 150, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            display: none;
+            pointer-events: auto;
+            animation: pulse 2s infinite;
+        }
+        
+        .treasure-found {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #8B4513;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            display: none;
+            pointer-events: auto;
+            animation: celebration 3s infinite;
+            box-shadow: 0 0 30px #FFD700;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        @keyframes celebration {
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+            25% { transform: translate(-50%, -50%) rotate(5deg) scale(1.1); }
+            50% { transform: translate(-50%, -50%) rotate(0deg) scale(1.05); }
+            75% { transform: translate(-50%, -50%) rotate(-5deg) scale(1.1); }
+            100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+        }
+        
+        .marker-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 200px;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- UI Elements -->
+    <div id="ui">
+        <div class="progress-container">
+            <div>Progreso: <span id="progress">0/4</span></div>
+            <div>Pistas encontradas: <span id="clues-found">0</span></div>
+        </div>
+        
+        <div class="instructions">
+            <div>🎯 <strong>El Tesoro del Conocimiento</strong></div>
+            <div>Busca los marcadores en: Recepción → Aula Magna → Cantina → Biblioteca</div>
+            <div>Usa la cámara para escanear los marcadores impresos</div>
+        </div>
+        
+        <div class="found-message" id="found-message">
+            ¡Pista encontrada! Continúa buscando...
+        </div>
+        
+        <div class="treasure-found" id="treasure-found">
+            🏆 ¡FELICITACIONES! 🏆<br>
+            Has encontrado el Tesoro del Conocimiento<br>
+            <small>La sabiduría de la Universidad Católica está contigo</small>
+        </div>
+        
+        <div class="marker-info" id="marker-info" style="display: none;">
+            <div id="marker-name"></div>
+            <div id="marker-description"></div>
+        </div>
+    </div>
+
+    <!-- A-Frame Scene -->
+    <a-scene 
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true;"
+        background="color: #87CEEB">
+        
+        <!-- Recepción Marker -->
+        <a-marker 
+            id="reception-marker" 
+            type="pattern" 
+            url="markers/reception-marker.patt"
+            emitevents="true"
+            cursor="rayOrigin: mouse">
+            
+            <a-plane 
+                position="0 0 0" 
+                rotation="-90 0 0" 
+                width="2" 
+                height="2" 
+                color="#4CAF50"
+                opacity="0.3">
+            </a-plane>
+            
+            <a-text 
+                value="🏛️ RECEPCIÓN" 
+                position="0 1.5 0" 
+                align="center" 
+                color="#2E7D32" 
+                width="6"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-text 
+                value="Bienvenido a la Universidad Católica\nFundada en 1985\nEdificio construido en 1925\n\nTu búsqueda del Tesoro del Conocimiento\ncomienza aquí..." 
+                position="0 0.5 0" 
+                align="center" 
+                color="#1B5E20" 
+                width="4"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-text 
+                value="➡️ Busca el marcador en el Aula Magna" 
+                position="0 -1 0" 
+                align="center" 
+                color="#FF6B35" 
+                width="3"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-sphere 
+                position="0 2 0" 
+                radius="0.1" 
+                color="#FFD700"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+            </a-sphere>
+        </a-marker>
+        
+        <!-- Aula Magna Marker -->
+        <a-marker 
+            id="aula-magna-marker" 
+            type="pattern" 
+            url="markers/aula-magna-marker.patt"
+            emitevents="true"
+            cursor="rayOrigin: mouse">
+            
+            <a-plane 
+                position="0 0 0" 
+                rotation="-90 0 0" 
+                width="2" 
+                height="2" 
+                color="#2196F3"
+                opacity="0.3">
+            </a-plane>
+            
+            <a-text 
+                value="🎓 AULA MAGNA" 
+                position="0 1.5 0" 
+                align="center" 
+                color="#1565C0" 
+                width="6"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-text 
+                value="Aquí se imparte el conocimiento\nDesde 1925, las monjas del\nSagrado Corazón enseñaron aquí\n\nEl aprendizaje es la clave..." 
+                position="0 0.5 0" 
+                align="center" 
+                color="#0D47A1" 
+                width="4"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-text 
+                value="➡️ Busca el marcador en la Cantina" 
+                position="0 -1 0" 
+                align="center" 
+                color="#FF6B35" 
+                width="3"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-box 
+                position="0 2 0" 
+                width="0.2" 
+                height="0.2" 
+                depth="0.2" 
+                color="#FFD700"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+            </a-box>
+        </a-marker>
+        
+        <!-- Cantina Marker -->
+        <a-marker 
+            id="cantina-marker" 
+            type="pattern" 
+            url="markers/cantina-marker.patt"
+            emitevents="true"
+            cursor="rayOrigin: mouse">
+            
+            <a-plane 
+                position="0 0 0" 
+                rotation="-90 0 0" 
+                width="2" 
+                height="2" 
+                color="#FF9800"
+                opacity="0.3">
+            </a-plane>
+            
+            <a-text 
+                value="🍽️ CANTINA" 
+                position="0 1.5 0" 
+                align="center" 
+                color="#E65100" 
+                width="6"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-text 
+                value="La comunidad estudiantil se reúne aquí\nCompartir experiencias y conocimientos\nes parte del aprendizaje\n\nLa unión hace la fuerza..." 
+                position="0 0.5 0" 
+                align="center" 
+                color="#BF360C" 
+                width="4"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-text 
+                value="➡️ Busca el marcador en la Biblioteca" 
+                position="0 -1 0" 
+                align="center" 
+                color="#FF6B35" 
+                width="3"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-cylinder 
+                position="0 2 0" 
+                radius="0.1" 
+                height="0.2" 
+                color="#FFD700"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+            </a-cylinder>
+        </a-marker>
+        
+        <!-- Biblioteca Marker (Tesoro) -->
+        <a-marker 
+            id="biblioteca-marker" 
+            type="pattern" 
+            url="markers/biblioteca-marker.patt"
+            emitevents="true"
+            cursor="rayOrigin: mouse">
+            
+            <a-plane 
+                position="0 0 0" 
+                rotation="-90 0 0" 
+                width="2" 
+                height="2" 
+                color="#9C27B0"
+                opacity="0.3">
+            </a-plane>
+            
+            <a-text 
+                value="📚 BIBLIOTECA" 
+                position="0 1.5 0" 
+                align="center" 
+                color="#6A1B9A" 
+                width="6"
+                font="kelsonsans">
+            </a-text>
+            
+            <a-text 
+                value="¡FELICITACIONES!\nHas encontrado el\nTESORO DEL CONOCIMIENTO" 
+                position="0 0.5 0" 
+                align="center" 
+                color="#4A148C" 
+                width="4"
+                font="kelsonsans">
+            </a-text>
+            
+            <!-- Tesoro 3D -->
+            <a-box 
+                position="0 0.5 0" 
+                width="0.8" 
+                height="0.6" 
+                depth="0.2" 
+                color="#FFD700"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 3000">
+            </a-box>
+            
+            <a-text 
+                value="📖" 
+                position="0 0.5 0.15" 
+                align="center" 
+                color="#8B4513" 
+                width="2"
+                font="kelsonsans">
+            </a-text>
+            
+            <!-- Partículas doradas -->
+            <a-entity 
+                particle-system="preset: dust; color: #FFD700; particleCount: 50"
+                position="0 1 0">
+            </a-entity>
+        </a-marker>
+        
+        <!-- Camera -->
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        // Game state
+        let gameState = {
+            foundMarkers: new Set(),
+            totalMarkers: 4,
+            currentMarker: null
+        };
+        
+        // Audio context for sounds
+        let audioContext;
+        
+        // Initialize audio
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.log('Web Audio API not supported');
+            }
+        }
+        
+        // Play sound effect
+        function playSound(frequency, duration, type = 'sine') {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+        
+        // Play discovery sound
+        function playDiscoverySound() {
+            playSound(523, 0.3); // C5
+            setTimeout(() => playSound(659, 0.3), 150); // E5
+            setTimeout(() => playSound(784, 0.5), 300); // G5
+        }
+        
+        // Play treasure sound
+        function playTreasureSound() {
+            const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+            notes.forEach((note, index) => {
+                setTimeout(() => playSound(note, 0.4), index * 200);
+            });
+        }
+        
+        // Update progress display
+        function updateProgress() {
+            document.getElementById('progress').textContent = `${gameState.foundMarkers.size}/${gameState.totalMarkers}`;
+            document.getElementById('clues-found').textContent = gameState.foundMarkers.size;
+        }
+        
+        // Show found message
+        function showFoundMessage() {
+            const message = document.getElementById('found-message');
+            message.style.display = 'block';
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Show treasure found message
+        function showTreasureFound() {
+            const message = document.getElementById('treasure-found');
+            message.style.display = 'block';
+            playTreasureSound();
+        }
+        
+        // Show marker info
+        function showMarkerInfo(markerName, description) {
+            document.getElementById('marker-name').textContent = markerName;
+            document.getElementById('marker-description').textContent = description;
+            document.getElementById('marker-info').style.display = 'block';
+        }
+        
+        // Hide marker info
+        function hideMarkerInfo() {
+            document.getElementById('marker-info').style.display = 'none';
+        }
+        
+        // Marker event handlers
+        function setupMarkerEvents() {
+            const markers = [
+                { id: 'reception-marker', name: 'Recepción', description: 'Punto de inicio de tu aventura' },
+                { id: 'aula-magna-marker', name: 'Aula Magna', description: 'Donde se imparte el conocimiento' },
+                { id: 'cantina-marker', name: 'Cantina', description: 'Lugar de encuentro estudiantil' },
+                { id: 'biblioteca-marker', name: 'Biblioteca', description: 'El tesoro del conocimiento' }
+            ];
+            
+            markers.forEach(marker => {
+                const markerElement = document.getElementById(marker.id);
+                
+                markerElement.addEventListener('markerFound', () => {
+                    if (!gameState.foundMarkers.has(marker.id)) {
+                        gameState.foundMarkers.add(marker.id);
+                        gameState.currentMarker = marker.id;
+                        updateProgress();
+                        showFoundMessage();
+                        playDiscoverySound();
+                        showMarkerInfo(marker.name, marker.description);
+                        
+                        // Check if all markers found
+                        if (gameState.foundMarkers.size === gameState.totalMarkers) {
+                            setTimeout(showTreasureFound, 2000);
+                        }
+                    }
+                });
+                
+                markerElement.addEventListener('markerLost', () => {
+                    hideMarkerInfo();
+                });
+            });
+        }
+        
+        // Initialize game
+        function initGame() {
+            initAudio();
+            setupMarkerEvents();
+            updateProgress();
+            
+            // Add click to start audio context (required by browsers)
+            document.addEventListener('click', () => {
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+            }, { once: true });
+        }
+        
+        // Start game when page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>

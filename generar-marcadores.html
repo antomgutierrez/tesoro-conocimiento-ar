@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Marcadores AR - El Tesoro del Conocimiento</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #FFD700;
+            margin-bottom: 30px;
+        }
+        
+        .marker-section {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #FFD700;
+        }
+        
+        .marker-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+        
+        .marker-description {
+            margin-bottom: 15px;
+            color: #E0E0E0;
+        }
+        
+        .marker-canvas {
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            margin: 10px 0;
+            background: white;
+        }
+        
+        .download-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        
+        .download-btn:hover {
+            background: #45a049;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            background: #FFD700;
+            color: #000;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Generador de Marcadores AR</h1>
+        <h2>El Tesoro del Conocimiento - Universidad Católica</h2>
+        
+        <div class="instructions">
+            <h3>📋 Instrucciones para Generar Marcadores</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Diseña cada marcador</strong> usando los canvas de abajo
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Descarga cada marcador</strong> como imagen PNG
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Ve al generador oficial de AR.js</strong>: <a href="https://jeromeetienne.github.io/AR.js/three.js/examples/marker-training/examples/generator.html" target="_blank" style="color: #FFD700;">Generador AR.js</a>
+            </div>
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>Sube cada imagen</strong> al generador y descarga el archivo .patt
+            </div>
+            <div class="step">
+                <span class="step-number">5</span>
+                <strong>Reemplaza los archivos</strong> en la carpeta markers/ del proyecto
+            </div>
+        </div>
+        
+        <!-- Recepción Marker -->
+        <div class="marker-section">
+            <div class="marker-title">🏛️ Marcador de Recepción</div>
+            <div class="marker-description">
+                Punto de inicio del juego. Debe ser fácilmente reconocible y único.
+                Incluye elementos relacionados con la historia del edificio.
+            </div>
+            <canvas id="reception-canvas" class="marker-canvas" width="400" height="400"></canvas>
+            <br>
+            <button class="download-btn" onclick="downloadMarker('reception-canvas', 'reception-marker')">
+                📥 Descargar Marcador de Recepción
+            </button>
+        </div>
+        
+        <!-- Aula Magna Marker -->
+        <div class="marker-section">
+            <div class="marker-title">🎓 Marcador de Aula Magna</div>
+            <div class="marker-description">
+                Segundo marcador en la secuencia. Relacionado con el aprendizaje y la educación.
+            </div>
+            <canvas id="aula-magna-canvas" class="marker-canvas" width="400" height="400"></canvas>
+            <br>
+            <button class="download-btn" onclick="downloadMarker('aula-magna-canvas', 'aula-magna-marker')">
+                📥 Descargar Marcador de Aula Magna
+            </button>
+        </div>
+        
+        <!-- Cantina Marker -->
+        <div class="marker-section">
+            <div class="marker-title">🍽️ Marcador de Cantina</div>
+            <div class="marker-description">
+                Tercer marcador en la secuencia. Relacionado con la comunidad estudiantil.
+            </div>
+            <canvas id="cantina-canvas" class="marker-canvas" width="400" height="400"></canvas>
+            <br>
+            <button class="download-btn" onclick="downloadMarker('cantina-canvas', 'cantina-marker')">
+                📥 Descargar Marcador de Cantina
+            </button>
+        </div>
+        
+        <!-- Biblioteca Marker -->
+        <div class="marker-section">
+            <div class="marker-title">📚 Marcador de Biblioteca (Tesoro)</div>
+            <div class="marker-description">
+                Marcador final donde se encuentra el tesoro. Debe ser especial y memorable.
+            </div>
+            <canvas id="biblioteca-canvas" class="marker-canvas" width="400" height="400"></canvas>
+            <br>
+            <button class="download-btn" onclick="downloadMarker('biblioteca-canvas', 'biblioteca-marker')">
+                📥 Descargar Marcador de Biblioteca
+            </button>
+        </div>
+        
+        <div class="instructions">
+            <h3>💡 Consejos para Diseñar Marcadores</h3>
+            <ul>
+                <li><strong>Alto contraste</strong>: Usa colores muy diferentes (negro/blanco)</li>
+                <li><strong>Patrones únicos</strong>: Cada marcador debe ser claramente diferente</li>
+                <li><strong>Tamaño adecuado</strong>: Diseña para imprimir en 10x10 cm</li>
+                <li><strong>Simplicidad</strong>: Evita detalles muy pequeños que se pierdan al imprimir</li>
+                <li><strong>Estabilidad</strong>: Usa formas geométricas que sean fáciles de detectar</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Función para dibujar marcadores personalizados
+        function drawMarker(canvasId, type) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, 400, 400);
+            
+            // Fondo blanco
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, 400, 400);
+            
+            // Borde negro
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(20, 20, 360, 360);
+            
+            // Dibujar según el tipo de marcador
+            switch(type) {
+                case 'reception':
+                    drawReceptionMarker(ctx);
+                    break;
+                case 'aula-magna':
+                    drawAulaMagnaMarker(ctx);
+                    break;
+                case 'cantina':
+                    drawCantinaMarker(ctx);
+                    break;
+                case 'biblioteca':
+                    drawBibliotecaMarker(ctx);
+                    break;
+            }
+        }
+        
+        function drawReceptionMarker(ctx) {
+            // Dibujar edificio estilizado
+            ctx.fillStyle = '#2E7D32';
+            ctx.fillRect(100, 150, 200, 120);
+            
+            // Techo
+            ctx.fillStyle = '#1B5E20';
+            ctx.beginPath();
+            ctx.moveTo(80, 150);
+            ctx.lineTo(200, 100);
+            ctx.lineTo(320, 150);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Puerta
+            ctx.fillStyle = '#8D6E63';
+            ctx.fillRect(180, 200, 40, 70);
+            
+            // Ventanas
+            ctx.fillStyle = '#1976D2';
+            ctx.fillRect(120, 180, 30, 30);
+            ctx.fillRect(250, 180, 30, 30);
+            
+            // Texto
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('RECEPCIÓN', 200, 320);
+            ctx.fillText('UCU', 200, 350);
+        }
+        
+        function drawAulaMagnaMarker(ctx) {
+            // Dibujar aula con pupitres
+            ctx.fillStyle = '#1565C0';
+            ctx.fillRect(100, 150, 200, 120);
+            
+            // Pizarra
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(120, 160, 160, 80);
+            
+            // Pupitres (círculos)
+            ctx.fillStyle = '#424242';
+            for(let i = 0; i < 3; i++) {
+                for(let j = 0; j < 4; j++) {
+                    ctx.beginPath();
+                    ctx.arc(140 + j * 40, 280 + i * 20, 8, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+            
+            // Texto
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('AULA MAGNA', 200, 320);
+            ctx.fillText('UCU', 200, 350);
+        }
+        
+        function drawCantinaMarker(ctx) {
+            // Dibujar mesa y sillas
+            ctx.fillStyle = '#E65100';
+            ctx.fillRect(120, 200, 160, 80);
+            
+            // Sillas alrededor
+            ctx.fillStyle = '#FF9800';
+            for(let i = 0; i < 4; i++) {
+                ctx.fillRect(100 + i * 80, 180, 20, 20);
+                ctx.fillRect(100 + i * 80, 300, 20, 20);
+            }
+            
+            // Plato y taza
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(180, 220, 15, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.fillStyle = '#8D6E63';
+            ctx.fillRect(200, 210, 12, 20);
+            
+            // Texto
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('CANTINA', 200, 320);
+            ctx.fillText('UCU', 200, 350);
+        }
+        
+        function drawBibliotecaMarker(ctx) {
+            // Dibujar estantería con libros
+            ctx.fillStyle = '#6A1B9A';
+            ctx.fillRect(100, 150, 200, 120);
+            
+            // Estantes
+            for(let i = 0; i < 4; i++) {
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(120, 170 + i * 25);
+                ctx.lineTo(280, 170 + i * 25);
+                ctx.stroke();
+            }
+            
+            // Libros
+            ctx.fillStyle = '#FFD700';
+            for(let i = 0; i < 6; i++) {
+                ctx.fillRect(130 + i * 25, 175, 20, 20);
+                ctx.fillRect(130 + i * 25, 200, 20, 20);
+                ctx.fillRect(130 + i * 25, 225, 20, 20);
+            }
+            
+            // Tesoro (corona)
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(200, 100, 25, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Texto
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('BIBLIOTECA', 200, 320);
+            ctx.fillText('TESORO', 200, 350);
+        }
+        
+        // Función para descargar marcador
+        function downloadMarker(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename + '.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Inicializar todos los marcadores
+        window.onload = function() {
+            drawMarker('reception-canvas', 'reception');
+            drawMarker('aula-magna-canvas', 'aula-magna');
+            drawMarker('cantina-canvas', 'cantina');
+            drawMarker('biblioteca-canvas', 'biblioteca');
+        };
+    </script>
+</body>
+</html>
