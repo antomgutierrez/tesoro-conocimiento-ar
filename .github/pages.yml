@@ -1,0 +1,26 @@
+# GitHub Pages Configuration
+# This file helps configure GitHub Pages for the AR Treasure Hunt project
+
+# Build and deployment settings
+build:
+  # Since this is a static site, no build process is needed
+  # All files are served directly from the repository root
+  
+# Source settings
+source:
+  branch: main
+  path: /
+  
+# Custom domain (optional)
+# Uncomment and set your custom domain if you have one
+# custom_domain: your-domain.com
+
+# HTTPS enforcement
+# GitHub Pages automatically enforces HTTPS for custom domains
+# For github.io domains, HTTPS is available but not enforced by default
+
+# Redirects (if needed)
+# You can add redirects here if necessary
+# redirects:
+#   - from: /old-path
+#     to: /new-path
