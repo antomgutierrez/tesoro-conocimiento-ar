@@ -156,7 +156,7 @@
     <!-- A-Frame Scene -->
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3; trackingMethod: best;"
+        arjs="sourceType: webcam; debugUIEnabled: true;"
         vr-mode-ui="enabled: false"
         renderer="logarithmicDepthBuffer: true;"
         background="color: #87CEEB">
@@ -583,8 +583,31 @@
             }
         }
 
+        // Debug AR.js initialization
+        function debugARjs() {
+            console.log('=== AR.js Debug Info ===');
+            console.log('A-Frame version:', aframe.version);
+            console.log('AR.js available:', typeof ARjs !== 'undefined');
+            console.log('THREE.js available:', typeof THREE !== 'undefined');
+            console.log('Camera available:', navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+            console.log('HTTPS:', location.protocol === 'https:');
+            console.log('User Agent:', navigator.userAgent);
+            
+            // Check if scene is initialized
+            const scene = document.querySelector('a-scene');
+            if (scene) {
+                console.log('Scene element found:', scene);
+                console.log('Scene loaded:', scene.hasLoaded);
+            } else {
+                console.error('Scene element not found!');
+            }
+        }
+
         // Initialize game
         async function initGame() {
+            // Debug first
+            debugARjs();
+            
             // Request camera permission first
             const cameraGranted = await requestCameraPermission();
             if (!cameraGranted) {
@@ -601,6 +624,12 @@
                     audioContext.resume();
                 }
             }, { once: true });
+            
+            // Wait a bit and check again
+            setTimeout(() => {
+                console.log('=== After 3 seconds ===');
+                debugARjs();
+            }, 3000);
         }
         
         // Start game when page loads
