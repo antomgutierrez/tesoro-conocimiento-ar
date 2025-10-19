@@ -68,9 +68,14 @@
       </a-marker>
 
       <!-- Marcador 5 (meta del mapa) -->
-      <a-marker type="pattern" url="markers/meta.patt">
-        <a-box position="0 0.5 0" material="color: gold; metalness: 0.8; roughness: 0.2;"></a-box>
-        <a-text value="TESORO" position="0 1.5 0" align="center" color="gold" scale="2 2 2"></a-text>
+      <a-marker type="pattern" url="markers/meta.patt" id="marker-tesoro">
+        <a-entity
+          gltf-model="url(modelos/tesoro.glb)"
+          scale="0.3 0.3 0.3"
+          rotation="0 180 0"
+          position="0 0 0">
+        </a-entity>
+        <a-text value="¡TESORO ENCONTRADO!" position="0 2 0" align="center" color="gold" scale="1.5 1.5 1.5"></a-text>
       </a-marker>
 
       <!-- Cámara AR -->
@@ -115,8 +120,13 @@
         document.querySelectorAll('a-marker').forEach(function(marker) {
           marker.addEventListener('markerFound', function() {
             console.log('¡Marcador detectado!', marker.id);
-            document.getElementById('status').textContent = '¡Marcador detectado!';
-            document.getElementById('status').style.background = 'rgba(0,255,0,0.8)';
+            if (marker.id === 'marker-tesoro') {
+              document.getElementById('status').textContent = '¡TESORO ENCONTRADO! ¡FELICITACIONES!';
+              document.getElementById('status').style.background = 'rgba(255,215,0,0.8)';
+            } else {
+              document.getElementById('status').textContent = '¡Marcador detectado!';
+              document.getElementById('status').style.background = 'rgba(0,255,0,0.8)';
+            }
           });
           
           marker.addEventListener('markerLost', function() {
@@ -125,6 +135,20 @@
             document.getElementById('status').style.background = 'rgba(0,0,0,0.8)';
           });
         });
+        
+        // Manejo específico del modelo GLTF del tesoro
+        const treasureModel = document.querySelector('#marker-tesoro a-entity[gltf-model]');
+        if (treasureModel) {
+          treasureModel.addEventListener('model-loaded', function() {
+            console.log('✅ Modelo del tesoro cargado correctamente');
+          });
+          
+          treasureModel.addEventListener('model-error', function() {
+            console.error('❌ Error cargando modelo del tesoro');
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = 'Error: No se pudo cargar el modelo del tesoro';
+          });
+        }
       });
     </script>
   </body>
