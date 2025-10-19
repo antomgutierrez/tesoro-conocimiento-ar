@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Debug AR - Diagnóstico</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar-nft.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+        #debug-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            max-width: 300px;
+            font-size: 12px;
+        }
+        #status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="debug-info">
+        <h3>Debug Info</h3>
+        <div id="camera-status">Cámara: Verificando...</div>
+        <div id="ar-status">AR.js: Verificando...</div>
+        <div id="marker-status">Marcadores: Verificando...</div>
+        <div id="model-status">Modelo: Verificando...</div>
+    </div>
+    
+    <div id="status">Iniciando diagnóstico...</div>
+    
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true;">
+        
+        <!-- Luz ambiental -->
+        <a-entity light="type: ambient; intensity: 0.8"></a-entity>
+        <a-entity light="type: directional; intensity: 0.6" position="1 1 0"></a-entity>
+
+        <!-- Marcador de prueba simple -->
+        <a-marker type="pattern" url="markers/meta.patt">
+            <a-box position="0 0.5 0" material="color: red;"></a-box>
+            <a-text value="TEST" position="0 1.5 0" align="center" color="white"></a-text>
+        </a-marker>
+
+        <!-- Cámara AR -->
+        <a-entity camera></a-entity>
+
+    </a-scene>
+
+    <script>
+        let debugInfo = {
+            camera: false,
+            ar: false,
+            markers: false,
+            model: false
+        };
+
+        function updateStatus() {
+            document.getElementById('camera-status').textContent = 
+                `Cámara: ${debugInfo.camera ? '✅ OK' : '❌ Error'}`;
+            document.getElementById('ar-status').textContent = 
+                `AR.js: ${debugInfo.ar ? '✅ OK' : '❌ Error'}`;
+            document.getElementById('marker-status').textContent = 
+                `Marcadores: ${debugInfo.markers ? '✅ OK' : '❌ Error'}`;
+            document.getElementById('model-status').textContent = 
+                `Modelo: ${debugInfo.model ? '✅ OK' : '❌ Error'}`;
+        }
+
+        window.addEventListener('load', function() {
+            console.log('=== DIAGNÓSTICO AR ===');
+            
+            // Verificar A-Frame
+            if (typeof AFRAME !== 'undefined') {
+                console.log('✅ A-Frame cargado');
+                debugInfo.ar = true;
+            } else {
+                console.error('❌ A-Frame no cargado');
+            }
+            
+            // Verificar AR.js
+            if (typeof THREEx !== 'undefined') {
+                console.log('✅ AR.js cargado');
+            } else {
+                console.error('❌ AR.js no cargado');
+            }
+            
+            updateStatus();
+        });
+
+        // Eventos de la escena
+        document.querySelector('a-scene').addEventListener('loaded', function() {
+            console.log('✅ Escena AR cargada');
+            debugInfo.ar = true;
+            updateStatus();
+        });
+
+        // Eventos de cámara
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                console.log('✅ Cámara accesible');
+                debugInfo.camera = true;
+                updateStatus();
+                stream.getTracks().forEach(track => track.stop());
+            })
+            .catch(function(error) {
+                console.error('❌ Error de cámara:', error);
+                document.getElementById('status').textContent = 
+                    'Error: No se puede acceder a la cámara. Verifica permisos.';
+            });
+
+        // Eventos de marcadores
+        document.querySelector('a-marker').addEventListener('markerFound', function() {
+            console.log('✅ Marcador detectado');
+            debugInfo.markers = true;
+            updateStatus();
+            document.getElementById('status').textContent = '¡Marcador detectado!';
+        });
+
+        document.querySelector('a-marker').addEventListener('markerLost', function() {
+            console.log('❌ Marcador perdido');
+            document.getElementById('status').textContent = 'Marcador perdido. Apunta la cámara al marcador.';
+        });
+
+        // Manejo de errores generales
+        window.addEventListener('error', function(e) {
+            console.error('❌ Error general:', e.error);
+            document.getElementById('status').textContent = 'Error: ' + e.message;
+        });
+
+        // Verificar archivos de marcadores
+        fetch('markers/meta.patt')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Archivo de marcador accesible');
+                    debugInfo.markers = true;
+                } else {
+                    console.error('❌ Archivo de marcador no accesible');
+                }
+                updateStatus();
+            })
+            .catch(error => {
+                console.error('❌ Error cargando marcador:', error);
+                updateStatus();
+            });
+    </script>
+</body>
+</html>

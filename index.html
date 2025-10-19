@@ -3,15 +3,43 @@
     <meta charset="utf-8" />
     <title>AR.js + A-Frame - Escena Básica</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.4.1/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <style>
       body { margin: 0; overflow: hidden; }
+      #loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 1000;
+        text-align: center;
+      }
+      #error {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        background: rgba(255,0,0,0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 1000;
+        display: none;
+      }
     </style>
   </head>
 
   <body>
+    <div id="loading">Cargando experiencia AR...</div>
+    <div id="error"></div>
+    
     <!-- La escena AR -->
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
       
       <!-- Luz ambiental y direccional -->
       <a-entity light="type: ambient; intensity: 0.8"></a-entity>
@@ -39,17 +67,47 @@
 
       <!-- Marcador 5 (meta del mapa) -->
       <a-marker type="pattern" url="markers/meta.patt">
-        <a-entity
-          gltf-model="modelos/tesoro.glb"
-          scale="0.5 0.5 0.5"
-          rotation="0 180 0"
-          position="0 0 0">
-        </a-entity>
+        <a-box position="0 0.5 0" material="color: gold; metalness: 0.8; roughness: 0.2;"></a-box>
+        <a-text value="TESORO" position="0 1.5 0" align="center" color="gold" scale="2 2 2"></a-text>
       </a-marker>
 
       <!-- Cámara AR -->
       <a-entity camera></a-entity>
 
     </a-scene>
+
+    <script>
+      // Manejo de errores y carga
+      window.addEventListener('load', function() {
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        
+        // Ocultar loading después de 3 segundos
+        setTimeout(() => {
+          loading.style.display = 'none';
+        }, 3000);
+        
+        // Manejo de errores de A-Frame
+        document.querySelector('a-scene').addEventListener('loaded', function() {
+          console.log('Escena AR cargada correctamente');
+          loading.style.display = 'none';
+        });
+        
+        // Manejo de errores de cámara
+        document.querySelector('a-scene').addEventListener('camera-error', function() {
+          error.style.display = 'block';
+          error.textContent = 'Error: No se pudo acceder a la cámara. Asegúrate de permitir el acceso.';
+          loading.style.display = 'none';
+        });
+        
+        // Manejo de errores generales
+        window.addEventListener('error', function(e) {
+          console.error('Error:', e.error);
+          error.style.display = 'block';
+          error.textContent = 'Error: ' + e.message;
+          loading.style.display = 'none';
+        });
+      });
+    </script>
   </body>
 </html>
