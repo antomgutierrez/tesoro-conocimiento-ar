@@ -5,22 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Tesoro del Conocimiento - AR UCU</title>
     
-    <!-- A-Frame -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js" 
-            onerror="loadFallbackAframe()"></script>
-    
-    <!-- AR.js -->
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/ar.js@1.2.0/build/aframe-ar.js"
-            onerror="loadFallbackARjs()"></script>
-    
-    <!-- A-Frame extras -->
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/ar.js@1.2.0/build/aframe-ar.js"></script>
     
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             overflow: hidden;
         }
@@ -35,7 +27,7 @@
             pointer-events: none;
         }
         
-        .progress-container {
+        .progress {
             position: absolute;
             top: 20px;
             left: 20px;
@@ -62,7 +54,7 @@
             pointer-events: auto;
         }
         
-        .found-message {
+        .message {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -76,10 +68,9 @@
             font-weight: bold;
             display: none;
             pointer-events: auto;
-            animation: pulse 2s infinite;
         }
         
-        .treasure-found {
+        .treasure {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -93,459 +84,88 @@
             font-weight: bold;
             display: none;
             pointer-events: auto;
-            animation: celebration 3s infinite;
             box-shadow: 0 0 30px #FFD700;
-        }
-        
-        @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.05); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-        
-        @keyframes celebration {
-            0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
-            25% { transform: translate(-50%, -50%) rotate(5deg) scale(1.1); }
-            50% { transform: translate(-50%, -50%) rotate(0deg) scale(1.05); }
-            75% { transform: translate(-50%, -50%) rotate(-5deg) scale(1.1); }
-            100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
-        }
-        
-        .marker-info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            max-width: 200px;
-            pointer-events: auto;
         }
     </style>
 </head>
 <body>
-    <!-- UI Elements -->
     <div id="ui">
-        <div class="progress-container">
+        <div class="progress">
             <div>Progreso: <span id="progress">0/5</span></div>
-            <div>Pistas encontradas: <span id="clues-found">0</span></div>
+            <div>Pistas: <span id="clues">0</span></div>
         </div>
         
         <div class="instructions">
             <div>🎯 <strong>El Tesoro del Conocimiento</strong></div>
-            <div>Busca los marcadores en: Recepción → Aula Magna → Cantina → Patio → Biblioteca</div>
-            <div>Usa la cámara para escanear los marcadores impresos</div>
-            <button onclick="forceInit()" style="background: #FF6B35; color: white; border: none; padding: 10px; border-radius: 5px; margin-top: 10px; cursor: pointer;">
-                🔄 Inicializar Cámara
-            </button>
-            <button onclick="restartCamera()" style="background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; margin-top: 5px; cursor: pointer;">
-                📹 Reiniciar Cámara
-            </button>
-            <button onclick="diagnoseLibraries()" style="background: #2196F3; color: white; border: none; padding: 10px; border-radius: 5px; margin-top: 5px; cursor: pointer;">
-                🔍 Diagnosticar Librerías
-            </button>
+            <div>Recepción → Aula Magna → Cantina → Patio → Biblioteca</div>
+            <div>Escanea los marcadores con la cámara</div>
         </div>
         
-        <div class="found-message" id="found-message">
+        <div class="message" id="found-message">
             ¡Pista encontrada! Continúa buscando...
         </div>
         
-        <div class="treasure-found" id="treasure-found">
+        <div class="treasure" id="treasure">
             🏆 ¡FELICITACIONES! 🏆<br>
-            Has encontrado el Tesoro del Conocimiento<br>
-            <small>La sabiduría de la Universidad Católica está contigo</small>
-        </div>
-        
-        <div class="marker-info" id="marker-info" style="display: none;">
-            <div id="marker-name"></div>
-            <div id="marker-description"></div>
+            Has encontrado el Tesoro del Conocimiento
         </div>
     </div>
 
-    <!-- A-Frame Scene -->
-    <a-scene 
-        embedded 
-        arjs="sourceType: webcam; debugUIEnabled: true;"
-        vr-mode-ui="enabled: false"
-        renderer="logarithmicDepthBuffer: true;"
-        background="color: #87CEEB">
+    <a-scene embedded arjs="sourceType: webcam;" vr-mode-ui="enabled: false">
         
-        <!-- Recepción Marker -->
-        <a-marker 
-            id="reception-marker" 
-            type="pattern" 
-            url="markers/pattern-RECEPCION.patt"
-            emitevents="true"
-            cursor="rayOrigin: mouse">
-            
-            <a-plane 
-                position="0 0 0" 
-                rotation="-90 0 0" 
-                width="2" 
-                height="2" 
-                color="#4CAF50"
-                opacity="0.3">
-            </a-plane>
-            
-            <a-text 
-                value="🏛️ RECEPCIÓN" 
-                position="0 1.5 0" 
-                align="center" 
-                color="#2E7D32" 
-                width="6"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-text 
-                value="Bienvenido a la Universidad Católica\nFundada en 1985\nEdificio construido en 1925\n\nTu búsqueda del Tesoro del Conocimiento\ncomienza aquí..." 
-                position="0 0.5 0" 
-                align="center" 
-                color="#1B5E20" 
-                width="4"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-text 
-                value="➡️ Busca el marcador en el Aula Magna" 
-                position="0 -1 0" 
-                align="center" 
-                color="#FF6B35" 
-                width="3"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-sphere 
-                position="0 2 0" 
-                radius="0.1" 
-                color="#FFD700"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
-            </a-sphere>
+        <a-marker id="reception" type="pattern" url="markers/pattern-RECEPCION.patt">
+            <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#4CAF50" opacity="0.3"></a-plane>
+            <a-text value="🏛️ RECEPCIÓN" position="0 1.5 0" align="center" color="#2E7D32" width="6"></a-text>
+            <a-text value="Bienvenido a la Universidad Católica\nFundada en 1985\nEdificio construido en 1925\n\nTu búsqueda del Tesoro del Conocimiento\ncomienza aquí..." position="0 0.5 0" align="center" color="#1B5E20" width="4"></a-text>
+            <a-text value="➡️ Busca el marcador en el Aula Magna" position="0 -1 0" align="center" color="#FF6B35" width="3"></a-text>
+            <a-sphere position="0 2 0" radius="0.1" color="#FFD700" animation="property: rotation; to: 0 360 0; loop: true; dur: 2000"></a-sphere>
         </a-marker>
         
-        <!-- Aula Magna Marker -->
-        <a-marker 
-            id="aula-magna-marker" 
-            type="pattern" 
-            url="markers/pattern-AULA_MAGNA.patt"
-            emitevents="true"
-            cursor="rayOrigin: mouse">
-            
-            <a-plane 
-                position="0 0 0" 
-                rotation="-90 0 0" 
-                width="2" 
-                height="2" 
-                color="#2196F3"
-                opacity="0.3">
-            </a-plane>
-            
-            <a-text 
-                value="🎓 AULA MAGNA" 
-                position="0 1.5 0" 
-                align="center" 
-                color="#1565C0" 
-                width="6"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-text 
-                value="Aquí se imparte el conocimiento\nDesde 1925, las monjas del\nSagrado Corazón enseñaron aquí\n\nEl aprendizaje es la clave..." 
-                position="0 0.5 0" 
-                align="center" 
-                color="#0D47A1" 
-                width="4"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-text 
-                value="➡️ Busca el marcador en la Cantina" 
-                position="0 -1 0" 
-                align="center" 
-                color="#FF6B35" 
-                width="3"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-box 
-                position="0 2 0" 
-                width="0.2" 
-                height="0.2" 
-                depth="0.2" 
-                color="#FFD700"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
-            </a-box>
+        <a-marker id="aula-magna" type="pattern" url="markers/pattern-AULA_MAGNA.patt">
+            <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#2196F3" opacity="0.3"></a-plane>
+            <a-text value="🎓 AULA MAGNA" position="0 1.5 0" align="center" color="#1565C0" width="6"></a-text>
+            <a-text value="Aquí se imparte el conocimiento\nDesde 1925, las monjas del\nSagrado Corazón enseñaron aquí\n\nEl aprendizaje es la clave..." position="0 0.5 0" align="center" color="#0D47A1" width="4"></a-text>
+            <a-text value="➡️ Busca el marcador en la Cantina" position="0 -1 0" align="center" color="#FF6B35" width="3"></a-text>
+            <a-box position="0 2 0" width="0.2" height="0.2" depth="0.2" color="#FFD700" animation="property: rotation; to: 0 360 0; loop: true; dur: 2000"></a-box>
         </a-marker>
         
-        <!-- Cantina Marker -->
-        <a-marker 
-            id="cantina-marker" 
-            type="pattern" 
-            url="markers/pattern-CANTINA.patt"
-            emitevents="true"
-            cursor="rayOrigin: mouse">
-            
-            <a-plane 
-                position="0 0 0" 
-                rotation="-90 0 0" 
-                width="2" 
-                height="2" 
-                color="#FF9800"
-                opacity="0.3">
-            </a-plane>
-            
-            <a-text 
-                value="🍽️ CANTINA" 
-                position="0 1.5 0" 
-                align="center" 
-                color="#E65100" 
-                width="6"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-text 
-                value="La comunidad estudiantil se reúne aquí\nCompartir experiencias y conocimientos\nes parte del aprendizaje\n\nLa unión hace la fuerza..." 
-                position="0 0.5 0" 
-                align="center" 
-                color="#BF360C" 
-                width="4"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-text 
-                value="➡️ Busca el marcador en el Patio" 
-                position="0 -1 0" 
-                align="center" 
-                color="#FF6B35" 
-                width="3"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-cylinder 
-                position="0 2 0" 
-                radius="0.1" 
-                height="0.2" 
-                color="#FFD700"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
-            </a-cylinder>
+        <a-marker id="cantina" type="pattern" url="markers/pattern-CANTINA.patt">
+            <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#FF9800" opacity="0.3"></a-plane>
+            <a-text value="🍽️ CANTINA" position="0 1.5 0" align="center" color="#E65100" width="6"></a-text>
+            <a-text value="La comunidad estudiantil se reúne aquí\nCompartir experiencias y conocimientos\nes parte del aprendizaje\n\nLa unión hace la fuerza..." position="0 0.5 0" align="center" color="#BF360C" width="4"></a-text>
+            <a-text value="➡️ Busca el marcador en el Patio" position="0 -1 0" align="center" color="#FF6B35" width="3"></a-text>
+            <a-cylinder position="0 2 0" radius="0.1" height="0.2" color="#FFD700" animation="property: rotation; to: 0 360 0; loop: true; dur: 2000"></a-cylinder>
         </a-marker>
         
-        <!-- Patio Marker -->
-        <a-marker 
-            id="patio-marker" 
-            type="pattern" 
-            url="markers/pattern-PATIO.patt"
-            emitevents="true"
-            cursor="rayOrigin: mouse">
-            
-            <a-plane 
-                position="0 0 0" 
-                rotation="-90 0 0" 
-                width="2" 
-                height="2" 
-                color="#4CAF50"
-                opacity="0.3">
-            </a-plane>
-            
-            <a-text 
-                value="🌳 PATIO" 
-                position="0 1.5 0" 
-                align="center" 
-                color="#2E7D32" 
-                width="6"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-text 
-                value="El espacio de encuentro al aire libre\nDonde los estudiantes se reúnen\npara compartir ideas y descansar\n\nLa naturaleza también enseña..." 
-                position="0 0.5 0" 
-                align="center" 
-                color="#1B5E20" 
-                width="4"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-text 
-                value="➡️ Busca el marcador en la Biblioteca" 
-                position="0 -1 0" 
-                align="center" 
-                color="#FF6B35" 
-                width="3"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-cone 
-                position="0 2 0" 
-                radius-bottom="0.1" 
-                height="0.2" 
-                color="#FFD700"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
-            </a-cone>
+        <a-marker id="patio" type="pattern" url="markers/pattern-PATIO.patt">
+            <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#4CAF50" opacity="0.3"></a-plane>
+            <a-text value="🌳 PATIO" position="0 1.5 0" align="center" color="#2E7D32" width="6"></a-text>
+            <a-text value="El espacio de encuentro al aire libre\nDonde los estudiantes se reúnen\npara compartir ideas y descansar\n\nLa naturaleza también enseña..." position="0 0.5 0" align="center" color="#1B5E20" width="4"></a-text>
+            <a-text value="➡️ Busca el marcador en la Biblioteca" position="0 -1 0" align="center" color="#FF6B35" width="3"></a-text>
+            <a-cone position="0 2 0" radius-bottom="0.1" height="0.2" color="#FFD700" animation="property: rotation; to: 0 360 0; loop: true; dur: 2000"></a-cone>
         </a-marker>
         
-        <!-- Biblioteca Marker (Tesoro) -->
-        <a-marker 
-            id="biblioteca-marker" 
-            type="pattern" 
-            url="markers/pattern-BIBLIOTECA.patt"
-            emitevents="true"
-            cursor="rayOrigin: mouse">
-            
-            <a-plane 
-                position="0 0 0" 
-                rotation="-90 0 0" 
-                width="2" 
-                height="2" 
-                color="#9C27B0"
-                opacity="0.3">
-            </a-plane>
-            
-            <a-text 
-                value="📚 BIBLIOTECA" 
-                position="0 1.5 0" 
-                align="center" 
-                color="#6A1B9A" 
-                width="6"
-                font="kelsonsans">
-            </a-text>
-            
-            <a-text 
-                value="¡FELICITACIONES!\nHas encontrado el\nTESORO DEL CONOCIMIENTO" 
-                position="0 0.5 0" 
-                align="center" 
-                color="#4A148C" 
-                width="4"
-                font="kelsonsans">
-            </a-text>
-            
-            <!-- Tesoro 3D -->
-            <a-box 
-                position="0 0.5 0" 
-                width="0.8" 
-                height="0.6" 
-                depth="0.2" 
-                color="#FFD700"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 3000">
-            </a-box>
-            
-            <a-text 
-                value="📖" 
-                position="0 0.5 0.15" 
-                align="center" 
-                color="#8B4513" 
-                width="2"
-                font="kelsonsans">
-            </a-text>
-            
-            <!-- Partículas doradas -->
-            <a-entity 
-                particle-system="preset: dust; color: #FFD700; particleCount: 50"
-                position="0 1 0">
-            </a-entity>
+        <a-marker id="biblioteca" type="pattern" url="markers/pattern-BIBLIOTECA.patt">
+            <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#9C27B0" opacity="0.3"></a-plane>
+            <a-text value="📚 BIBLIOTECA" position="0 1.5 0" align="center" color="#6A1B9A" width="6"></a-text>
+            <a-text value="¡FELICITACIONES!\nHas encontrado el\nTESORO DEL CONOCIMIENTO" position="0 0.5 0" align="center" color="#4A148C" width="4"></a-text>
+            <a-box position="0 0.5 0" width="0.8" height="0.6" depth="0.2" color="#FFD700" animation="property: rotation; to: 0 360 0; loop: true; dur: 3000"></a-box>
+            <a-text value="📖" position="0 0.5 0.15" align="center" color="#8B4513" width="2"></a-text>
         </a-marker>
         
-        <!-- Camera -->
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-        // Game state
-        let gameState = {
-            foundMarkers: new Set(),
-            totalMarkers: 5,
-            currentMarker: null
-        };
+        let foundMarkers = new Set();
+        const totalMarkers = 5;
         
-        // Fallback loading functions
-        function loadFallbackAframe() {
-            console.log('Loading A-Frame fallback...');
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.0/aframe.min.js';
-            script.onload = () => console.log('A-Frame fallback loaded');
-            script.onerror = () => console.error('A-Frame fallback failed');
-            document.head.appendChild(script);
-        }
-        
-        function loadFallbackARjs() {
-            console.log('Loading AR.js fallback...');
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/ar.js/1.2.0/aframe-ar.min.js';
-            script.onload = () => console.log('AR.js fallback loaded');
-            script.onerror = () => console.error('AR.js fallback failed');
-            document.head.appendChild(script);
-        }
-        
-        // Check if libraries are loaded
-        function checkLibrariesLoaded() {
-            const aframeLoaded = typeof aframe !== 'undefined';
-            const arjsLoaded = typeof ARjs !== 'undefined';
-            const threeLoaded = typeof THREE !== 'undefined';
-            
-            console.log('Library check:', {
-                aframe: aframeLoaded,
-                arjs: arjsLoaded,
-                three: threeLoaded
-            });
-            
-            return aframeLoaded && arjsLoaded && threeLoaded;
-        }
-        
-        // Audio context for sounds
-        let audioContext;
-        
-        // Initialize audio
-        function initAudio() {
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            } catch (e) {
-                console.log('Web Audio API not supported');
-            }
-        }
-        
-        // Play sound effect
-        function playSound(frequency, duration, type = 'sine') {
-            if (!audioContext) return;
-            
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-            oscillator.type = type;
-            
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + duration);
-        }
-        
-        // Play discovery sound
-        function playDiscoverySound() {
-            playSound(523, 0.3); // C5
-            setTimeout(() => playSound(659, 0.3), 150); // E5
-            setTimeout(() => playSound(784, 0.5), 300); // G5
-        }
-        
-        // Play treasure sound
-        function playTreasureSound() {
-            const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
-            notes.forEach((note, index) => {
-                setTimeout(() => playSound(note, 0.4), index * 200);
-            });
-        }
-        
-        // Update progress display
         function updateProgress() {
-            document.getElementById('progress').textContent = `${gameState.foundMarkers.size}/${gameState.totalMarkers}`;
-            document.getElementById('clues-found').textContent = gameState.foundMarkers.size;
+            document.getElementById('progress').textContent = `${foundMarkers.size}/${totalMarkers}`;
+            document.getElementById('clues').textContent = foundMarkers.size;
         }
         
-        // Show found message
-        function showFoundMessage() {
+        function showMessage() {
             const message = document.getElementById('found-message');
             message.style.display = 'block';
             setTimeout(() => {
@@ -553,266 +173,34 @@
             }, 3000);
         }
         
-        // Show treasure found message
-        function showTreasureFound() {
-            const message = document.getElementById('treasure-found');
-            message.style.display = 'block';
-            playTreasureSound();
+        function showTreasure() {
+            document.getElementById('treasure').style.display = 'block';
         }
         
-        // Show marker info
-        function showMarkerInfo(markerName, description) {
-            document.getElementById('marker-name').textContent = markerName;
-            document.getElementById('marker-description').textContent = description;
-            document.getElementById('marker-info').style.display = 'block';
-        }
-        
-        // Hide marker info
-        function hideMarkerInfo() {
-            document.getElementById('marker-info').style.display = 'none';
-        }
-        
-        // Marker event handlers
-        function setupMarkerEvents() {
-            const markers = [
-                { id: 'reception-marker', name: 'Recepción', description: 'Punto de inicio de tu aventura' },
-                { id: 'aula-magna-marker', name: 'Aula Magna', description: 'Donde se imparte el conocimiento' },
-                { id: 'cantina-marker', name: 'Cantina', description: 'Lugar de encuentro estudiantil' },
-                { id: 'patio-marker', name: 'Patio', description: 'Espacio de encuentro al aire libre' },
-                { id: 'biblioteca-marker', name: 'Biblioteca', description: 'El tesoro del conocimiento' }
-            ];
+        function setupMarkers() {
+            const markers = ['reception', 'aula-magna', 'cantina', 'patio', 'biblioteca'];
             
-            markers.forEach(marker => {
-                const markerElement = document.getElementById(marker.id);
+            markers.forEach(markerId => {
+                const marker = document.getElementById(markerId);
                 
-                markerElement.addEventListener('markerFound', () => {
-                    if (!gameState.foundMarkers.has(marker.id)) {
-                        gameState.foundMarkers.add(marker.id);
-                        gameState.currentMarker = marker.id;
+                marker.addEventListener('markerFound', () => {
+                    if (!foundMarkers.has(markerId)) {
+                        foundMarkers.add(markerId);
                         updateProgress();
-                        showFoundMessage();
-                        playDiscoverySound();
-                        showMarkerInfo(marker.name, marker.description);
+                        showMessage();
                         
-                        // Check if all markers found
-                        if (gameState.foundMarkers.size === gameState.totalMarkers) {
-                            setTimeout(showTreasureFound, 2000);
+                        if (foundMarkers.size === totalMarkers) {
+                            setTimeout(showTreasure, 2000);
                         }
                     }
-                });
-                
-                markerElement.addEventListener('markerLost', () => {
-                    hideMarkerInfo();
                 });
             });
         }
         
-        // Request camera permission (without taking control)
-        async function requestCameraPermission() {
-            try {
-                // Just check if we can access camera, don't actually use it
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    } 
-                });
-                console.log('Camera permission granted');
-                // Immediately stop the stream to let AR.js handle it
-                stream.getTracks().forEach(track => track.stop());
-                
-                // Wait a bit for AR.js to initialize
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                return true;
-            } catch (error) {
-                console.error('Camera permission denied:', error);
-                alert('Se necesita acceso a la cámara para jugar. Por favor, permite el acceso a la cámara y recarga la página.');
-                return false;
-            }
-        }
-
-        // Debug AR.js initialization
-        function debugARjs() {
-            console.log('=== AR.js Debug Info ===');
-            console.log('A-Frame available:', typeof aframe !== 'undefined');
-            if (typeof aframe !== 'undefined') {
-                console.log('A-Frame version:', aframe.version);
-            }
-            console.log('AR.js available:', typeof ARjs !== 'undefined');
-            console.log('THREE.js available:', typeof THREE !== 'undefined');
-            console.log('Camera available:', navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-            console.log('HTTPS:', location.protocol === 'https:');
-            console.log('User Agent:', navigator.userAgent);
-            
-            // Check if scene is initialized
-            const scene = document.querySelector('a-scene');
-            if (scene) {
-                console.log('Scene element found:', scene);
-                console.log('Scene loaded:', scene.hasLoaded);
-            } else {
-                console.error('Scene element not found!');
-            }
-        }
-
-        // Monitor camera status
-        function monitorCamera() {
-            const scene = document.querySelector('a-scene');
-            if (scene) {
-                scene.addEventListener('camera-init', () => {
-                    console.log('Camera initialized by AR.js');
-                });
-                
-                scene.addEventListener('camera-error', (event) => {
-                    console.error('Camera error:', event.detail);
-                });
-                
-                // Check if camera is working every 5 seconds
-                setInterval(() => {
-                    const video = document.querySelector('video');
-                    if (video) {
-                        console.log('Camera status:', video.readyState, video.paused);
-                        if (video.paused || video.readyState < 2) {
-                            console.warn('Camera appears to be stopped, trying to restart...');
-                            // Try to restart AR.js
-                            scene.emit('restart');
-                        }
-                    }
-                }, 5000);
-            }
-        }
-
-        // Initialize game
-        async function initGame() {
-            // Debug first
-            debugARjs();
-            
-            // Request camera permission first
-            const cameraGranted = await requestCameraPermission();
-            if (!cameraGranted) {
-                return;
-            }
-            
-            initAudio();
-            setupMarkerEvents();
+        window.addEventListener('load', () => {
+            setupMarkers();
             updateProgress();
-            monitorCamera();
-            
-            // Add click to start audio context (required by browsers)
-            document.addEventListener('click', () => {
-                if (audioContext && audioContext.state === 'suspended') {
-                    audioContext.resume();
-                }
-            }, { once: true });
-            
-            // Wait a bit and check again
-            setTimeout(() => {
-                console.log('=== After 3 seconds ===');
-                debugARjs();
-            }, 3000);
-        }
-        
-        // Wait for libraries to load
-        function waitForLibraries() {
-            return new Promise((resolve) => {
-                let attempts = 0;
-                const maxAttempts = 40; // 20 seconds max
-                
-                const checkLibraries = () => {
-                    attempts++;
-                    console.log(`Library check attempt ${attempts}/${maxAttempts}`);
-                    
-                    if (checkLibrariesLoaded()) {
-                        console.log('All libraries loaded successfully');
-                        resolve(true);
-                    } else if (attempts >= maxAttempts) {
-                        console.error('Libraries failed to load after maximum attempts');
-                        alert('Error: Las librerías no se pudieron cargar. Por favor, recarga la página o verifica tu conexión a internet.');
-                        resolve(false);
-                    } else {
-                        console.log('Waiting for libraries...');
-                        setTimeout(checkLibraries, 500);
-                    }
-                };
-                checkLibraries();
-            });
-        }
-
-        // Start game when page loads
-        window.addEventListener('load', async () => {
-            console.log('Window loaded, waiting for libraries...');
-            await waitForLibraries();
-            initGame();
         });
-        
-        // Also try to initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('DOM Content Loaded');
-            await waitForLibraries();
-            initGame();
-        });
-        
-        // Force initialization after a delay
-        setTimeout(async () => {
-            console.log('Force initialization attempt');
-            await waitForLibraries();
-            initGame();
-        }, 5000);
-        
-        // Emergency initialization function
-        function forceInit() {
-            console.log('Force initialization triggered by user');
-            debugARjs();
-            initGame();
-        }
-        
-        // Restart camera function
-        function restartCamera() {
-            console.log('Restarting camera...');
-            const scene = document.querySelector('a-scene');
-            if (scene) {
-                // Try to restart AR.js
-                scene.emit('restart');
-                
-                // Also try to reinitialize
-                setTimeout(() => {
-                    console.log('Reinitializing after restart...');
-                    initGame();
-                }, 2000);
-            } else {
-                console.error('Scene not found, cannot restart camera');
-            }
-        }
-        
-        // Diagnose libraries function
-        function diagnoseLibraries() {
-            console.log('=== LIBRARY DIAGNOSIS ===');
-            console.log('A-Frame:', typeof aframe !== 'undefined' ? '✅ Loaded' : '❌ Not loaded');
-            console.log('AR.js:', typeof ARjs !== 'undefined' ? '✅ Loaded' : '❌ Not loaded');
-            console.log('THREE.js:', typeof THREE !== 'undefined' ? '✅ Loaded' : '❌ Not loaded');
-            console.log('HTTPS:', location.protocol === 'https:' ? '✅ Secure' : '❌ Not secure');
-            console.log('User Agent:', navigator.userAgent);
-            
-            // Check script tags
-            const scripts = document.querySelectorAll('script[src]');
-            console.log('Script tags found:', scripts.length);
-            scripts.forEach((script, index) => {
-                console.log(`Script ${index + 1}:`, script.src);
-            });
-            
-            // Check for network errors
-            console.log('Network status:', navigator.onLine ? '✅ Online' : '❌ Offline');
-            
-            // Try to load libraries manually
-            if (typeof aframe === 'undefined') {
-                console.log('Attempting to load A-Frame manually...');
-                loadFallbackAframe();
-            }
-            if (typeof ARjs === 'undefined') {
-                console.log('Attempting to load AR.js manually...');
-                loadFallbackARjs();
-            }
-        }
     </script>
 </body>
 </html>
