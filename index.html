@@ -37,17 +37,19 @@
   <body>
     <div id="loading">Cargando experiencia AR...</div>
     <div id="error"></div>
+    <div id="status" style="position: fixed; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; z-index: 1000; text-align: center; display: none;">Apunta la cámara al marcador</div>
     
     <!-- La escena AR -->
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3; markersAreaEnabled: true;">
       
       <!-- Luz ambiental y direccional -->
       <a-entity light="type: ambient; intensity: 0.8"></a-entity>
       <a-entity light="type: directional; intensity: 0.6" position="1 1 0"></a-entity>
 
       <!-- Marcador 1 (por ejemplo, recepcion.patt) -->
-      <a-marker type="pattern" url="markers/recepcion.patt">
+      <a-marker type="pattern" url="markers/recepcion.patt" id="marker-recepcion">
         <a-box position="0 0.5 0" material="color: gold;"></a-box>
+        <a-text value="RECEPCIÓN" position="0 1.5 0" align="center" color="white" scale="2 2 2"></a-text>
       </a-marker>
 
       <!-- Marcador 2 (aula magna) -->
@@ -91,6 +93,7 @@
         document.querySelector('a-scene').addEventListener('loaded', function() {
           console.log('Escena AR cargada correctamente');
           loading.style.display = 'none';
+          document.getElementById('status').style.display = 'block';
         });
         
         // Manejo de errores de cámara
@@ -106,6 +109,21 @@
           error.style.display = 'block';
           error.textContent = 'Error: ' + e.message;
           loading.style.display = 'none';
+        });
+        
+        // Detectar marcadores
+        document.querySelectorAll('a-marker').forEach(function(marker) {
+          marker.addEventListener('markerFound', function() {
+            console.log('¡Marcador detectado!', marker.id);
+            document.getElementById('status').textContent = '¡Marcador detectado!';
+            document.getElementById('status').style.background = 'rgba(0,255,0,0.8)';
+          });
+          
+          marker.addEventListener('markerLost', function() {
+            console.log('Marcador perdido', marker.id);
+            document.getElementById('status').textContent = 'Apunta la cámara al marcador';
+            document.getElementById('status').style.background = 'rgba(0,0,0,0.8)';
+          });
         });
       });
     </script>
