@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Tesoro del Conocimiento - AR UCU</title>
     
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/ar.js@1.2.0/build/aframe-ar.js"></script>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.4.1/aframe/build/aframe-ar.js"></script>
+
+    <link rel="icon" href="data:,">
     
     <style>
         body {
@@ -112,7 +114,10 @@
     </div>
 
     <a-scene embedded arjs="sourceType: webcam;" vr-mode-ui="enabled: false">
-        
+        <a-marker preset="hiro">
+            <a-box position="0 0.5 0" color="gold"></a-box>
+          </a-marker>
+
         <a-marker id="reception" type="pattern" url="markers/pattern-RECEPCION.patt">
             <a-plane position="0 0 0" rotation="-90 0 0" width="2" height="2" color="#4CAF50" opacity="0.3"></a-plane>
             <a-text value="🏛️ RECEPCIÓN" position="0 1.5 0" align="center" color="#2E7D32" width="6"></a-text>
@@ -153,7 +158,8 @@
             <a-text value="📖" position="0 0.5 0.15" align="center" color="#8B4513" width="2"></a-text>
         </a-marker>
         
-        <a-entity camera></a-entity>
+        <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true;" vr-mode-ui="enabled: false">
+
     </a-scene>
 
     <script>
@@ -198,9 +204,13 @@
         }
         
         window.addEventListener('load', () => {
-            setupMarkers();
-            updateProgress();
+            const scene = document.querySelector('a-scene');
+            scene.addEventListener('loaded', () => {
+                setupMarkers();
+                updateProgress();
+            });
         });
+
     </script>
 </body>
 </html>
