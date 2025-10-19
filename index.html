@@ -138,6 +138,9 @@
             <button onclick="forceInit()" style="background: #FF6B35; color: white; border: none; padding: 10px; border-radius: 5px; margin-top: 10px; cursor: pointer;">
                 🔄 Inicializar Cámara
             </button>
+            <button onclick="restartCamera()" style="background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; margin-top: 5px; cursor: pointer;">
+                📹 Reiniciar Cámara
+            </button>
         </div>
         
         <div class="found-message" id="found-message">
@@ -565,9 +568,10 @@
             });
         }
         
-        // Request camera permission
+        // Request camera permission (without taking control)
         async function requestCameraPermission() {
             try {
+                // Just check if we can access camera, don't actually use it
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
                         facingMode: 'environment',
@@ -576,8 +580,11 @@
                     } 
                 });
                 console.log('Camera permission granted');
-                // Stop the stream as AR.js will handle it
+                // Immediately stop the stream to let AR.js handle it
                 stream.getTracks().forEach(track => track.stop());
+                
+                // Wait a bit for AR.js to initialize
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 return true;
             } catch (error) {
                 console.error('Camera permission denied:', error);
@@ -609,6 +616,33 @@
             }
         }
 
+        // Monitor camera status
+        function monitorCamera() {
+            const scene = document.querySelector('a-scene');
+            if (scene) {
+                scene.addEventListener('camera-init', () => {
+                    console.log('Camera initialized by AR.js');
+                });
+                
+                scene.addEventListener('camera-error', (event) => {
+                    console.error('Camera error:', event.detail);
+                });
+                
+                // Check if camera is working every 5 seconds
+                setInterval(() => {
+                    const video = document.querySelector('video');
+                    if (video) {
+                        console.log('Camera status:', video.readyState, video.paused);
+                        if (video.paused || video.readyState < 2) {
+                            console.warn('Camera appears to be stopped, trying to restart...');
+                            // Try to restart AR.js
+                            scene.emit('restart');
+                        }
+                    }
+                }, 5000);
+            }
+        }
+
         // Initialize game
         async function initGame() {
             // Debug first
@@ -623,6 +657,7 @@
             initAudio();
             setupMarkerEvents();
             updateProgress();
+            monitorCamera();
             
             // Add click to start audio context (required by browsers)
             document.addEventListener('click', () => {
@@ -680,6 +715,24 @@
             console.log('Force initialization triggered by user');
             debugARjs();
             initGame();
+        }
+        
+        // Restart camera function
+        function restartCamera() {
+            console.log('Restarting camera...');
+            const scene = document.querySelector('a-scene');
+            if (scene) {
+                // Try to restart AR.js
+                scene.emit('restart');
+                
+                // Also try to reinitialize
+                setTimeout(() => {
+                    console.log('Reinitializing after restart...');
+                    initGame();
+                }, 2000);
+            } else {
+                console.error('Scene not found, cannot restart camera');
+            }
         }
     </script>
 </body>
