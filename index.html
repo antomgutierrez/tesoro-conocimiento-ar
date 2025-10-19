@@ -6,10 +6,10 @@
     <title>El Tesoro del Conocimiento - AR UCU</title>
     
     <!-- A-Frame -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@v1.4.0/dist/aframe.min.js"></script>
     
     <!-- AR.js -->
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/ar.js@1.2.0/build/aframe-ar-nft.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/ar.js@1.2.0/build/aframe-ar.js"></script>
     
     <!-- A-Frame extras -->
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
@@ -135,6 +135,9 @@
             <div>🎯 <strong>El Tesoro del Conocimiento</strong></div>
             <div>Busca los marcadores en: Recepción → Aula Magna → Cantina → Patio → Biblioteca</div>
             <div>Usa la cámara para escanear los marcadores impresos</div>
+            <button onclick="forceInit()" style="background: #FF6B35; color: white; border: none; padding: 10px; border-radius: 5px; margin-top: 10px; cursor: pointer;">
+                🔄 Inicializar Cámara
+            </button>
         </div>
         
         <div class="found-message" id="found-message">
@@ -586,7 +589,10 @@
         // Debug AR.js initialization
         function debugARjs() {
             console.log('=== AR.js Debug Info ===');
-            console.log('A-Frame version:', aframe.version);
+            console.log('A-Frame available:', typeof aframe !== 'undefined');
+            if (typeof aframe !== 'undefined') {
+                console.log('A-Frame version:', aframe.version);
+            }
             console.log('AR.js available:', typeof ARjs !== 'undefined');
             console.log('THREE.js available:', typeof THREE !== 'undefined');
             console.log('Camera available:', navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
@@ -632,8 +638,49 @@
             }, 3000);
         }
         
+        // Wait for libraries to load
+        function waitForLibraries() {
+            return new Promise((resolve) => {
+                const checkLibraries = () => {
+                    if (typeof aframe !== 'undefined' && typeof ARjs !== 'undefined') {
+                        console.log('All libraries loaded successfully');
+                        resolve(true);
+                    } else {
+                        console.log('Waiting for libraries...');
+                        setTimeout(checkLibraries, 500);
+                    }
+                };
+                checkLibraries();
+            });
+        }
+
         // Start game when page loads
-        window.addEventListener('load', initGame);
+        window.addEventListener('load', async () => {
+            console.log('Window loaded, waiting for libraries...');
+            await waitForLibraries();
+            initGame();
+        });
+        
+        // Also try to initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOM Content Loaded');
+            await waitForLibraries();
+            initGame();
+        });
+        
+        // Force initialization after a delay
+        setTimeout(async () => {
+            console.log('Force initialization attempt');
+            await waitForLibraries();
+            initGame();
+        }, 5000);
+        
+        // Emergency initialization function
+        function forceInit() {
+            console.log('Force initialization triggered by user');
+            debugARjs();
+            initGame();
+        }
     </script>
 </body>
 </html>
