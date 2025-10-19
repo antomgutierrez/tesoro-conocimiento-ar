@@ -6,10 +6,12 @@
     <title>El Tesoro del Conocimiento - AR UCU</title>
     
     <!-- A-Frame -->
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@v1.4.0/dist/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js" 
+            onerror="loadFallbackAframe()"></script>
     
     <!-- AR.js -->
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/ar.js@1.2.0/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/ar.js@1.2.0/build/aframe-ar.js"
+            onerror="loadFallbackARjs()"></script>
     
     <!-- A-Frame extras -->
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
@@ -140,6 +142,9 @@
             </button>
             <button onclick="restartCamera()" style="background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; margin-top: 5px; cursor: pointer;">
                 📹 Reiniciar Cámara
+            </button>
+            <button onclick="diagnoseLibraries()" style="background: #2196F3; color: white; border: none; padding: 10px; border-radius: 5px; margin-top: 5px; cursor: pointer;">
+                🔍 Diagnosticar Librerías
             </button>
         </div>
         
@@ -452,6 +457,40 @@
             currentMarker: null
         };
         
+        // Fallback loading functions
+        function loadFallbackAframe() {
+            console.log('Loading A-Frame fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.0/aframe.min.js';
+            script.onload = () => console.log('A-Frame fallback loaded');
+            script.onerror = () => console.error('A-Frame fallback failed');
+            document.head.appendChild(script);
+        }
+        
+        function loadFallbackARjs() {
+            console.log('Loading AR.js fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/ar.js/1.2.0/aframe-ar.min.js';
+            script.onload = () => console.log('AR.js fallback loaded');
+            script.onerror = () => console.error('AR.js fallback failed');
+            document.head.appendChild(script);
+        }
+        
+        // Check if libraries are loaded
+        function checkLibrariesLoaded() {
+            const aframeLoaded = typeof aframe !== 'undefined';
+            const arjsLoaded = typeof ARjs !== 'undefined';
+            const threeLoaded = typeof THREE !== 'undefined';
+            
+            console.log('Library check:', {
+                aframe: aframeLoaded,
+                arjs: arjsLoaded,
+                three: threeLoaded
+            });
+            
+            return aframeLoaded && arjsLoaded && threeLoaded;
+        }
+        
         // Audio context for sounds
         let audioContext;
         
@@ -676,10 +715,20 @@
         // Wait for libraries to load
         function waitForLibraries() {
             return new Promise((resolve) => {
+                let attempts = 0;
+                const maxAttempts = 40; // 20 seconds max
+                
                 const checkLibraries = () => {
-                    if (typeof aframe !== 'undefined' && typeof ARjs !== 'undefined') {
+                    attempts++;
+                    console.log(`Library check attempt ${attempts}/${maxAttempts}`);
+                    
+                    if (checkLibrariesLoaded()) {
                         console.log('All libraries loaded successfully');
                         resolve(true);
+                    } else if (attempts >= maxAttempts) {
+                        console.error('Libraries failed to load after maximum attempts');
+                        alert('Error: Las librerías no se pudieron cargar. Por favor, recarga la página o verifica tu conexión a internet.');
+                        resolve(false);
                     } else {
                         console.log('Waiting for libraries...');
                         setTimeout(checkLibraries, 500);
@@ -732,6 +781,36 @@
                 }, 2000);
             } else {
                 console.error('Scene not found, cannot restart camera');
+            }
+        }
+        
+        // Diagnose libraries function
+        function diagnoseLibraries() {
+            console.log('=== LIBRARY DIAGNOSIS ===');
+            console.log('A-Frame:', typeof aframe !== 'undefined' ? '✅ Loaded' : '❌ Not loaded');
+            console.log('AR.js:', typeof ARjs !== 'undefined' ? '✅ Loaded' : '❌ Not loaded');
+            console.log('THREE.js:', typeof THREE !== 'undefined' ? '✅ Loaded' : '❌ Not loaded');
+            console.log('HTTPS:', location.protocol === 'https:' ? '✅ Secure' : '❌ Not secure');
+            console.log('User Agent:', navigator.userAgent);
+            
+            // Check script tags
+            const scripts = document.querySelectorAll('script[src]');
+            console.log('Script tags found:', scripts.length);
+            scripts.forEach((script, index) => {
+                console.log(`Script ${index + 1}:`, script.src);
+            });
+            
+            // Check for network errors
+            console.log('Network status:', navigator.onLine ? '✅ Online' : '❌ Offline');
+            
+            // Try to load libraries manually
+            if (typeof aframe === 'undefined') {
+                console.log('Attempting to load A-Frame manually...');
+                loadFallbackAframe();
+            }
+            if (typeof ARjs === 'undefined') {
+                console.log('Attempting to load AR.js manually...');
+                loadFallbackARjs();
             }
         }
     </script>
