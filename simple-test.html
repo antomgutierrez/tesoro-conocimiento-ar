@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Test Simple AR</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar-nft.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="status">Apunta la cámara al marcador meta.patt</div>
+    
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true; markersAreaEnabled: true;">
+        
+        <!-- Luz -->
+        <a-entity light="type: ambient; intensity: 0.8"></a-entity>
+        <a-entity light="type: directional; intensity: 0.6" position="1 1 0"></a-entity>
+
+        <!-- Un solo marcador para probar -->
+        <a-marker type="pattern" url="markers/meta.patt" id="test-marker">
+            <a-box position="0 0.5 0" material="color: red;"></a-box>
+            <a-text value="¡FUNCIONA!" position="0 1.5 0" align="center" color="white" scale="2 2 2"></a-text>
+        </a-marker>
+
+        <!-- Cámara -->
+        <a-entity camera></a-entity>
+
+    </a-scene>
+
+    <script>
+        const status = document.getElementById('status');
+        
+        // Detectar marcador
+        document.querySelector('#test-marker').addEventListener('markerFound', function() {
+            console.log('¡Marcador detectado!');
+            status.textContent = '¡MARCADOR DETECTADO! ¡FUNCIONA!';
+            status.style.background = 'rgba(0,255,0,0.8)';
+        });
+        
+        document.querySelector('#test-marker').addEventListener('markerLost', function() {
+            console.log('Marcador perdido');
+            status.textContent = 'Apunta la cámara al marcador meta.patt';
+            status.style.background = 'rgba(0,0,0,0.8)';
+        });
+        
+        // Verificar que el archivo de marcador existe
+        fetch('markers/meta.patt')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Archivo de marcador accesible');
+                } else {
+                    console.error('❌ Archivo de marcador no accesible');
+                    status.textContent = 'Error: No se puede cargar el archivo de marcador';
+                    status.style.background = 'rgba(255,0,0,0.8)';
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error cargando marcador:', error);
+                status.textContent = 'Error: ' + error.message;
+                status.style.background = 'rgba(255,0,0,0.8)';
+            });
+    </script>
+</body>
+</html>
