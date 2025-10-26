@@ -243,36 +243,31 @@
         }
 
         function startExperience() {
+            // Ocultar overlay y mostrar elementos de la UI
             startOverlay.style.display = 'none';
-            loadingEl.style.display = 'block';
-
-            // Asegurarse de que el contexto de audio se reanude con la interacción del usuario
-            const audioContext = THREE.AudioContext.getContext();
-            if (audioContext.state === 'suspended') {
-                audioContext.resume().then(() => {
-                    console.log('AudioContext resumed successfully');
-                });
-            }
-
-            // Mostrar la escena y los elementos de la UI
             scene.style.display = 'block';
             progressEl.style.display = 'block';
 
-            // Forzar a la escena a entrar en modo AR, lo que debería activar el prompt
-            scene.enterAR();
-
-            if (scene.hasLoaded) {
-                initializeScene();
-            } else {
-                scene.addEventListener('loaded', initializeScene);
+            // Forzar la reanudación del contexto de audio
+            const audioContext = THREE.AudioContext.getContext();
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
             }
-        }
 
-        function initializeScene() {
-            setupMarkers();
-            updateProgress();
-            showStatus('🎯 Escanea el primer marcador para comenzar...');
-            loadingEl.style.display = 'none';
+            // Si la escena ya está cargada, inicializarla. Si no, esperar al evento 'loaded'.
+            if (scene.hasLoaded) {
+                loadingEl.style.display = 'none';
+                setupMarkers();
+                updateProgress();
+                showStatus('🎯 Escanea el primer marcador para comenzar...');
+            } else {
+                scene.addEventListener('loaded', () => {
+                    loadingEl.style.display = 'none';
+                    setupMarkers();
+                    updateProgress();
+                    showStatus('🎯 Escanea el primer marcador para comenzar...');
+                });
+            }
         }
 
         startOverlay.addEventListener('click', startExperience, { once: true });
