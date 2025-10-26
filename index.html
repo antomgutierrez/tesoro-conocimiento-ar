@@ -8,6 +8,9 @@
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <style>
       body { margin: 0; overflow: hidden; }
@@ -55,35 +58,34 @@
       <a-entity light="type: directional; intensity: 0.6" position="1 1 0"></a-entity>
 
       <a-marker type="pattern" url="markers/recepcion.patt" id="marker-recepcion">
-        <a-entity scale="0.5 0.5 0.5" rotation="-90 0 0">
-            <a-entity
-              gltf-model="url(modelos/pista_aula_magna.glb)"
-              animation="property: scale; to: 1 1 1; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
-            </a-entity>
-            <a-text 
-              value="La busqueda comienza donde se oculta la formula de la felicidad" 
-              position="0 8 0" 
-              font="https://fonts.gstatic.com/s/cinzel/v19/8vIK7wwARWk-v_2cTldm.woff"
-              color="#4a2c2a" 
-              scale="10 10 10">
-            </a-text>
+        <a-entity
+          gltf-model="url(modelos/pista_aula_magna.glb)"
+          rotation="-90 0 0"
+          position="0 -10 0"
+          animation="property: scale; to: 1 1 1; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
         </a-entity>
+        <a-text 
+          value="La busqueda comienza donde se oculta la formula de la felicidad" 
+          rotation="-90 0 0"
+          color="#4a2c2a"
+          position="-4 -10 -4"
+          scale="2 2 2">
+        </a-text>
       </a-marker>
 
       <!-- Marcador 2 (aula magna) -->
       <a-marker type="pattern" url="markers/aula_magna.patt" id="aula_magna">
         <a-entity
           gltf-model="url(modelos/pista_patio.glb)"
-          rotation="-90 0 0"
-          position="0 0 0"
+          rotation="0 270 90"
+          position="0 -7 0"
           animation="property: scale; to: 1 1 1; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
         </a-entity>
         <a-text 
-          value="Despues del esfuerzo, el alma necesita respiro entre el verde" 
-          position="0 1.5 0" 
-          font="https://fonts.gstatic.com/s/cinzel/v19/8vIK7wwARWk-v_2cTldm.woff"
-          color="#4a2c2a"
+          value="Despues del esfuerzo, \n el alma necesita respiro entre el verde" 
           rotation="-90 0 0"
+          color="#4a2c2a"
+          position="-4 -7 -4"
           scale="2 2 2">
         </a-text>
       </a-marker>
@@ -93,15 +95,14 @@
         <a-entity
           gltf-model="url(modelos/pista_cantina.glb)"
           rotation="-90 0 0"
-          position="0 0 0"
-          animation="property: scale; to: 1 1 1; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
+          position="0 -7 0"
+          animation="property: scale; to: 2 2 2; from: 0.5 0.5 0.5; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
         </a-entity>
         <a-text 
-          value="Hasta el sabio necesita energia. Disfruta del sabor del descanso. El tesoro esta cerca" 
-          position="0 1.5 0" 
-          font="https://fonts.gstatic.com/s/cinzel/v19/8vIK7wwARWk-v_2cTldm.woff"
-          color="#4a2c2a"
+          value="Hasta el sabio necesita energia. \nDisfruta del sabor del descanso. \nEl tesoro esta cerca..." 
           rotation="-90 0 0"
+          color="#4a2c2a"
+          position="-4 -7 -4"
           scale="2 2 2">
         </a-text>
       </a-marker>
@@ -111,15 +112,14 @@
         <a-entity
           gltf-model="url(modelos/pista_biblioteca.glb)"
           rotation="-90 0 0"
-          position="0 0 0"
-          animation="property: scale; to: 1 1 1; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
+          position="0 -7 3"
+          animation="property: scale; to: 2 2 2; from: 0.5 0.5 0.5; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
         </a-entity>
         <a-text 
-          value="Entre paginas y silencios, duerme el mayor de los tesoros. Solo quien ha recorrido el camino del conocimiento podra despertarlo" 
-          position="0 1.5 0" 
-          font="https://fonts.gstatic.com/s/cinzel/v19/8vIK7wwARWk-v_2cTldm.woff"
-          color="#4a2c2a"
+          value="Entre paginas y silencios, \nduerme el mayor de los tesoros. \nSolo quien ha recorrido el camino del conocimiento podra despertarlo" 
           rotation="-90 0 0"
+          color="#4a2c2a"
+          position="-2 -7 -4"
           scale="2 2 2">
         </a-text>
       </a-marker>
@@ -128,16 +128,15 @@
       <a-marker type="pattern" url="markers/meta.patt" id="marker-tesoro">
         <a-entity
           gltf-model="url(modelos/tesoro.glb)"
-          rotation="-90 0 0"
+          rotation="45 -180 0"
           position="0 0 0"
-          animation="property: scale; to: 1.2 1.2 1.2; from: 0.1 0.1 0.1; dur: 1000; easing: easeOutCubic; startEvents: markerFoundAnimation">
+          animation="property: scale; to: 10 10 10; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
         </a-entity>
         <a-text 
           value="¡TESORO ENCONTRADO!" 
-          position="0 1.5 0" 
-          font="https://fonts.gstatic.com/s/cinzel/v19/8vIK7wwARWk-v_2cTldm.woff"
-          color="#4a2c2a"
           rotation="-90 0 0"
+          color="#4a2c2a"
+          position="-2 0 -2"
           scale="2 2 2">
         </a-text>
       </a-marker>
