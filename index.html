@@ -38,41 +38,21 @@
         z-index: 1000;
         display: none;
       }
-      #start-overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.9);
-        color: white;
-        z-index: 2000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        flex-direction: column;
-        font-family: 'Cinzel', serif;
-        cursor: pointer;
-      }
-      #start-overlay h1 { font-size: 2.5em; margin-bottom: 0.5em; }
-      #start-overlay p { font-size: 1.2em; }
     </style>
   </head>
 
   <body>
     <div id="loading">Cargando experiencia AR...</div>
     <div id="error"></div>
-    <div id="start-overlay">
-      <h1>Búsqueda del Tesoro</h1>
-      <p>Presiona para comenzar</p>
-    </div>
     <div id="status" style="position: fixed; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; z-index: 1000; text-align: center; display: none;">Apunta la cámara al marcador</div>
-    <div id="progress" style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 10px; border-radius: 5px; z-index: 1000; font-family: monospace; display: none;"></div>
+    <div id="progress" style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 10px; border-radius: 5px; z-index: 1000; font-family: monospace;"></div>
 
     <audio id="sound-found" src="sounds/found.mp3" preload="auto"></audio>
     <audio id="sound-win" src="sounds/win.mp3" preload="auto"></audio>
     <audio id="sound-wrong" src="sounds/wrong.mp3" preload="auto"></audio>
     
     <!-- La escena AR -->
-    <a-scene embedded arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; markersAreaEnabled: true;" vr-mode-ui="enabled: false" style="display: none;">
+    <a-scene embedded arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; markersAreaEnabled: true;">
       
       <a-entity light="type: ambient; intensity: 0.8"></a-entity>
       <a-entity light="type: directional; intensity: 0.6" position="1 1 0"></a-entity>
@@ -172,7 +152,6 @@
         const loadingEl = document.getElementById('loading');
         const statusEl = document.getElementById('status');
         const progressEl = document.getElementById('progress');
-        const startOverlay = document.getElementById('start-overlay');
 
         const soundFound = document.getElementById('sound-found');
         const soundWin = document.getElementById('sound-win');
@@ -204,21 +183,24 @@
                 const model = marker.querySelector('a-entity[gltf-model]');
                 const text = marker.querySelector('a-text');
                 
+                // Ocultar modelo y texto al inicio
                 model.setAttribute('visible', false);
                 text.setAttribute('visible', false);
 
                 marker.addEventListener('markerFound', () => {
                     if (index > currentStep) {
                         showStatus('🔒 Aún no es momento de explorar esta área.', 'rgba(200,0,0,0.8)');
-                        soundWrong.play().catch(e => console.error("Error playing sound:", e));
+                        soundWrong.play();
+                        // Asegurarse de que todo esté oculto si la secuencia es incorrecta
                         model.setAttribute('visible', false);
                         text.setAttribute('visible', false);
                         return;
                     }
 
+                    // Mostrar modelo y texto
                     model.setAttribute('visible', true);
                     text.setAttribute('visible', true);
-                    model.emit('markerFoundAnimation');
+                    model.emit('markerFoundAnimation'); // Iniciar animación
 
                     if (foundMarkers.has(markerId)) return;
 
@@ -228,50 +210,27 @@
 
                     if (foundMarkers.size === sequence.length) {
                         showStatus('🏆 ¡Has encontrado el Tesoro del Conocimiento!', 'rgba(255,215,0,0.9)');
-                        soundWin.play().catch(e => console.error("Error playing sound:", e));
+                        soundWin.play();
                     } else {
                         showStatus('✅ ¡Pista encontrada! Continúa la búsqueda...', 'rgba(0,150,0,0.9)');
-                        soundFound.play().catch(e => console.error("Error playing sound:", e));
+                        soundFound.play();
                     }
                 });
 
                 marker.addEventListener('markerLost', () => {
+                    // Ocultar modelo y texto al perder el marcador
                     model.setAttribute('visible', false);
                     text.setAttribute('visible', false);
                 });
             });
         }
 
-        function startExperience() {
-            // Ocultar overlay y mostrar elementos de la UI
-            startOverlay.style.display = 'none';
-            scene.style.display = 'block';
-            progressEl.style.display = 'block';
-
-            // Forzar la reanudación del contexto de audio
-            const audioContext = THREE.AudioContext.getContext();
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-
-            // Si la escena ya está cargada, inicializarla. Si no, esperar al evento 'loaded'.
-            if (scene.hasLoaded) {
-                loadingEl.style.display = 'none';
-                setupMarkers();
-                updateProgress();
-                showStatus('🎯 Escanea el primer marcador para comenzar...');
-            } else {
-                scene.addEventListener('loaded', () => {
-                    loadingEl.style.display = 'none';
-                    setupMarkers();
-                    updateProgress();
-                    showStatus('🎯 Escanea el primer marcador para comenzar...');
-                });
-            }
-        }
-
-        startOverlay.addEventListener('click', startExperience, { once: true });
-        loadingEl.style.display = 'none'; // Ocultar carga inicial, se gestiona en startExperience
+        scene.addEventListener('loaded', () => {
+            setupMarkers();
+            updateProgress();
+            showStatus('🎯 Escanea el primer marcador para comenzar...');
+            loadingEl.style.display = 'none';
+        });
       });
     </script>
     
