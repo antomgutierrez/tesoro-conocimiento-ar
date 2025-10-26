@@ -243,31 +243,36 @@
         }
 
         function startExperience() {
-            // Ocultar overlay y mostrar elementos de la UI
             startOverlay.style.display = 'none';
+            loadingEl.style.display = 'block';
+
+            // Asegurarse de que el contexto de audio se reanude con la interacción del usuario
+            const audioContext = THREE.AudioContext.getContext();
+            if (audioContext.state === 'suspended') {
+                audioContext.resume().then(() => {
+                    console.log('AudioContext resumed successfully');
+                });
+            }
+
+            // Mostrar la escena y los elementos de la UI
             scene.style.display = 'block';
             progressEl.style.display = 'block';
 
-            // Forzar la reanudación del contexto de audio
-            const audioContext = THREE.AudioContext.getContext();
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
+            // Forzar a la escena a entrar en modo AR, lo que debería activar el prompt
+            scene.enterAR();
 
-            // Si la escena ya está cargada, inicializarla. Si no, esperar al evento 'loaded'.
             if (scene.hasLoaded) {
-                loadingEl.style.display = 'none';
-                setupMarkers();
-                updateProgress();
-                showStatus('🎯 Escanea el primer marcador para comenzar...');
+                initializeScene();
             } else {
-                scene.addEventListener('loaded', () => {
-                    loadingEl.style.display = 'none';
-                    setupMarkers();
-                    updateProgress();
-                    showStatus('🎯 Escanea el primer marcador para comenzar...');
-                });
+                scene.addEventListener('loaded', initializeScene);
             }
+        }
+
+        function initializeScene() {
+            setupMarkers();
+            updateProgress();
+            showStatus('🎯 Escanea el primer marcador para comenzar...');
+            loadingEl.style.display = 'none';
         }
 
         startOverlay.addEventListener('click', startExperience, { once: true });
