@@ -58,7 +58,7 @@
       <a-entity light="type: directional; intensity: 0.6" position="1 1 0"></a-entity>
 
       <a-marker type="pattern" url="markers/recepcion.patt" id="marker-recepcion">
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-entity
             gltf-model="url(modelos/pista_aula_magna.glb)"
             rotation="-90 0 0"
@@ -66,7 +66,7 @@
             animation="property: scale; to: 0.5 0.5 0.5; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
           </a-entity>
         </a-entity>
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-text 
             value="La busqueda comienza donde se oculta la formula de la felicidad" 
             rotation="-90 0 0"
@@ -79,7 +79,7 @@
 
       <!-- Marcador 2 (aula magna) -->
       <a-marker type="pattern" url="markers/aula_magna.patt" id="aula_magna">
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-entity
             gltf-model="url(modelos/pista_patio.glb)"
             rotation="0 270 90"
@@ -87,12 +87,12 @@
             animation="property: scale; to: 0.5 0.5 0.5; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
           </a-entity>
         </a-entity>
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-text 
             value="Despues del esfuerzo, \n el alma necesita respiro entre el verde" 
             rotation="-90 0 0"
             color="#4a2c2a"
-            position="4 0 -4"
+            position="8 0 -4"
             scale="1 1 1">
           </a-text>
         </a-entity>
@@ -100,7 +100,7 @@
 
       <!-- Marcador 3 (patio) -->
       <a-marker type="pattern" url="markers/patio.patt" id="patio">
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-entity
             gltf-model="url(modelos/pista_cantina.glb)"
             rotation="-90 0 0"
@@ -108,7 +108,7 @@
             animation="property: scale; to: 1 1 1; from: 0.5 0.5 0.5; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
           </a-entity>
         </a-entity>
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-text 
             value="Hasta el sabio necesita energia. \nDisfruta del sabor del descanso. \nEl tesoro esta cerca..." 
             rotation="-90 0 0"
@@ -121,7 +121,7 @@
 
       <!-- Marcador 4 (cantina) -->
       <a-marker type="pattern" url="markers/cantina.patt" id="cantina">
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-entity
             gltf-model="url(modelos/pista_biblioteca.glb)"
             rotation="-90 0 0"
@@ -129,7 +129,7 @@
             animation="property: scale; to: 0.5 0.5 0.5; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
           </a-entity>
         </a-entity>
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-text 
             value="Entre paginas y silencios, \nduerme el mayor de los tesoros. \nSolo quien ha recorrido el camino del conocimiento podra despertarlo" 
             rotation="-90 0 0"
@@ -142,7 +142,7 @@
 
       <!-- Marcador 5 (meta del mapa) -->
       <a-marker type="pattern" url="markers/meta.patt" id="marker-tesoro">
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-entity
             gltf-model="url(modelos/tesoro.glb)"
             rotation="45 -180 0"
@@ -150,7 +150,7 @@
             animation="property: scale; to: 10 10 10; from: 0.1 0.1 0.1; dur: 700; easing: easeOutCubic; startEvents: markerFoundAnimation">
           </a-entity>
         </a-entity>
-        <a-entity look-at="[camera]">
+        <a-entity>
           <a-text 
             value="¡TESORO ENCONTRADO!" 
             rotation="-90 0 0"
